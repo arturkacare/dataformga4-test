@@ -1,0 +1,22 @@
+SELECT
+  user_pseudo_id,
+  geo.country as country,
+  device.category,
+  count(distinct case when event_name = "page_view" then user_pseudo_id else null end) as page_view_users, --change event name as per your funnel
+  count(distinct case when event_name = "verification_email_sent" then user_pseudo_id else null end) as verification_email_sent_users, --change event name as per your funnel
+  count(distinct case when event_name = "email_verified" then user_pseudo_id else null end) as email_verified_users, --change event name as per your funnel
+  count(distinct case when event_name = "survey_completed" then user_pseudo_id else null end) as survey_completed_users, --change event name as per your funnel
+  count(distinct case when event_name = "purchase" then user_pseudo_id else null end) as purchase_users, --change event name as per your funnel
+  count(distinct case when event_name = "cms_connected" then user_pseudo_id else null end) as cms_connected, --change event name as per your funnel
+
+  PARSE_DATE('%Y%m%d', event_date) as date_parsed
+FROM `outvio-bigquery-ga4.analytics_279967712.events_*` --change data source
+Where _table_suffix between '20220601' and format_date('%Y%m%d',date_sub(current_date(), interval 1 day))
+/* AND event_name IN ("page_view", "verification_email_sent", "email_verified", "survey_completed", "purchase") */
+GROUP BY
+  user_pseudo_id,
+  country,
+  date_parsed,
+  user_pseudo_id,
+  category
+Order by purchase_users desc
